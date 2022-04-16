@@ -1,9 +1,9 @@
-package using_boring.domain.user
+package client.domain.user
 
 import arch.common.Program.{Context, MError}
-import using_boring.common.repo.RepoF
-import using_boring.domain.user.model.User
-import using_boring.infrastructure.ProgramLive._
+import arch.infra.repo.RepoF
+import client.domain.user.model.User
+import client.infrastructure.ProgramLive._
 
 object UserRepoLive {
 

@@ -1,4 +1,4 @@
-package using_boring.common.repo
+package arch.infra.repo
 
 trait Repo[F[_], Key, Entity] {
   def set(id: Key, a: Entity): F[Unit]

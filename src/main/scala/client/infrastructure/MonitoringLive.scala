@@ -1,7 +1,7 @@
-package using_boring.infrastructure
+package client.infrastructure
 
 import arch.infra.monitoring.MonitoringF
-import using_boring.infrastructure.ProgramLive._
+import client.infrastructure.ProgramLive._
 
 object MonitoringLive {
   object MonitoringApp extends MonitoringF[App]

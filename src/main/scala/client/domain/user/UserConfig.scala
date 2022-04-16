@@ -1,10 +1,10 @@
-package using_boring.domain.user
+package client.domain.user
 
 import arch.common.Program.MError
 import arch.infra.config.ConfigF
 import cats.implicits._
 import com.typesafe.config.Config
-import using_boring.infrastructure.ProgramLive._
+import client.infrastructure.ProgramLive._
 case class UserConfig(flag: Boolean, value: Option[Int])
 
 object UserConfig {

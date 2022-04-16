@@ -1,8 +1,8 @@
-package using_boring.domain.user.model
+package client.domain.user.model
 
+import arch.common.HasId
 import io.circe.generic.semiauto.{deriveDecoder, deriveEncoder}
 import io.circe.{Decoder, Encoder}
-import using_boring.common.HasId
 
 case class User(id: String) extends HasId[String]
 

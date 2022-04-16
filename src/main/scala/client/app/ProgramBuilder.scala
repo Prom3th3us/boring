@@ -1,12 +1,12 @@
-package using_boring.app
+package client.app
 
 import arch.common.Program.ProgramError
 import arch.infra.logging.LoggingLibrary
 import arch.infra.router.RouterF
 import com.typesafe.config.Config
-import using_boring.domain.user.model.User
-import using_boring.domain.user.service.find.FindUserAction
-import using_boring.domain.user.service.register.RegisterUserAction
+import client.domain.user.model.User
+import client.domain.user.service.find.FindUserAction
+import client.domain.user.service.register.RegisterUserAction
 
 object ProgramBuilder {
 
@@ -14,10 +14,10 @@ object ProgramBuilder {
     def buildApp(config: Config): RouterF[F]
   }
 
-  import using_boring.domain.user.UserRepoLive._
-  import using_boring.infrastructure.LoggingLive._
-  import using_boring.infrastructure.ProgramLive._
-  import using_boring.infrastructure.RouterLive._
+  import client.domain.user.UserRepoLive._
+  import client.infrastructure.LoggingLive._
+  import client.infrastructure.ProgramLive._
+  import client.infrastructure.RouterLive._
 
   implicit lazy val production: ProgramBuilder[App] = (config: Config) => {
     println(s"config = $config")

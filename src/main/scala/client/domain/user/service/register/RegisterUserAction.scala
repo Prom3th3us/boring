@@ -1,11 +1,11 @@
-package using_boring.domain.user.service.register
+package client.domain.user.service.register
 
 import arch.common.Program.{Context, MError, ProgramError}
 import arch.infra.router.{Action, DispatcherF, RouterF}
 import cats.implicits.*
-import using_boring.domain.user.UserRepoLive.UserRepoF
-import using_boring.domain.user.model.User
-import using_boring.domain.user.service.find.FindUserAction
+import client.domain.user.UserRepoLive.UserRepoF
+import client.domain.user.model.User
+import client.domain.user.service.find.FindUserAction
 
 case class RegisterUserAction(userId: String)
     extends Action[Either[ProgramError, Unit]]

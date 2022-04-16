@@ -1,8 +1,8 @@
-package using_boring.domain.user.service.find
+package client.domain.user.service.find
 
 import arch.infra.router.Action
-import using_boring.domain.user.UserRepoLive.UserRepoF
-import using_boring.domain.user.model.User
+import client.domain.user.UserRepoLive.UserRepoF
+import client.domain.user.model.User
 
 case class FindUserAction(id: String) extends Action[Option[User]]
 

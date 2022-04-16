@@ -1,7 +1,7 @@
-package using_boring.infrastructure
+package client.infrastructure
 
 import arch.infra.logging.LoggingF
-import using_boring.infrastructure.ProgramLive._
+import client.infrastructure.ProgramLive._
 
 object LoggingLive {
   object LoggingApp extends LoggingF[App]

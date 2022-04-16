@@ -1,13 +1,13 @@
-package using_boring.app
+package client.app
 
 import arch.common.Program.ProgramError
 import cats.effect.unsafe.IORuntime
 import com.typesafe.config.{Config, ConfigFactory}
-import using_boring.domain.user.model.User
-import using_boring.domain.user.service.find.FindUserAction
-import using_boring.domain.user.service.register
-import using_boring.domain.user.service.register.RegisterUserAction
-import using_boring.infrastructure.{ProgramLive}
+import client.domain.user.model.User
+import client.domain.user.service.find.FindUserAction
+import client.domain.user.service.register
+import client.domain.user.service.register.RegisterUserAction
+import client.infrastructure.{ProgramLive}
 
 object Runner {
   import ProgramBuilder._
@@ -30,7 +30,7 @@ object Runner {
       type Env[A] = ProgramLive.App[A]
       // EXECUTION
       val router = implicitly[ProgramBuilder[Env]].buildApp(config)
-      val actionResult = router.publish[Option[User], FindUserAction](
+      val actionResult = router.publish(
         FindUserAction("Prom3th3us")
       )
       // OUTPUT
@@ -42,13 +42,13 @@ object Runner {
       // EXECUTION
       val router = implicitly[ProgramBuilder[Env]].buildApp(config)
       for {
-        before <- router.publish[Option[User], FindUserAction](
+        before <- router.publish(
           FindUserAction("Prom3th3us")
         )
-        _ <- router.publish[Either[ProgramError, Unit], RegisterUserAction](
+        _ <- router.publish(
           register.RegisterUserAction("Prom3th3us")
         )
-        after <- router.publish[Option[User], FindUserAction](
+        after <- router.publish(
           FindUserAction("Prom3th3us")
         )
       } yield {

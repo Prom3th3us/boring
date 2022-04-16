@@ -1,4 +1,4 @@
-package using_boring.common.repo
+package arch.infra.repo
 
 import arch.common.Program
 import arch.common.Program.{Context, MError}

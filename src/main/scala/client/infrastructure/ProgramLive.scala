@@ -1,4 +1,4 @@
-package using_boring.infrastructure
+package client.infrastructure
 
 import arch.common.Program.ProgramError
 import cats.data.EitherT

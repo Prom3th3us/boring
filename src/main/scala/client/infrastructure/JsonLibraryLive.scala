@@ -1,7 +1,7 @@
-package using_boring.infrastructure
+package client.infrastructure
 
 import arch.infra.json.JsonLibraryF
-import using_boring.infrastructure.ProgramLive._
+import client.infrastructure.ProgramLive._
 
 object JsonLibraryLive {
   object JsonLibraryApp extends JsonLibraryF[App]

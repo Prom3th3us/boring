@@ -1,8 +1,8 @@
-package using_boring.infrastructure
+package client.infrastructure
 
 import arch.infra.logging.LoggingLibrary
 import arch.infra.router.RouterF
-import using_boring.infrastructure.ProgramLive._
+import client.infrastructure.ProgramLive._
 
 object RouterLive {
   class RouterApp(implicit logger: LoggingLibrary[App]) extends RouterF[App]

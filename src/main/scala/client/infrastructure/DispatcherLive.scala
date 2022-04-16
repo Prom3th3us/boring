@@ -1,7 +1,7 @@
-package using_boring.infrastructure
+package client.infrastructure
 
 import arch.infra.router.DispatcherF
-import using_boring.infrastructure.ProgramLive._
+import client.infrastructure.ProgramLive._
 
 object DispatcherLive {
   object DispatcherApp extends DispatcherF[App]
