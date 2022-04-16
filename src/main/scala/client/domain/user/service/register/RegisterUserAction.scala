@@ -1,7 +1,7 @@
 package client.domain.user.service.register
 
 import arch.common.Program.{Context, MError, ProgramError}
-import arch.infra.router.{Action, DispatcherF, RouterF}
+import arch.infra.router.{Action, RouterF}
 import cats.implicits.*
 import client.domain.user.UserRepoLive.UserRepoF
 import client.domain.user.model.User
