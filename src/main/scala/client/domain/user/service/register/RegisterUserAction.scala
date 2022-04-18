@@ -7,8 +7,10 @@ import client.domain.user.UserRepoLive.UserRepoF
 import client.domain.user.model.*
 import client.domain.user.model.User.*
 import client.domain.user.service.find.FindUserAction
-
-case class RegisterUserAction(userId: String) extends Action[Either[ProgramError, Unit]]
+import arch.infra.repo.Repo._
+import arch.infra.router.Router._
+import arch.common.Program.MError._
+case class RegisterUserAction(userId: UserId, user: User) extends Action[Either[ProgramError, Unit]]
 
 object RegisterUserAction {
   private val ctx = Context("register-user-action")
@@ -17,10 +19,8 @@ object RegisterUserAction {
       F[_]: MError: UserRepoF: RouterF
   ]: RegisterUserAction => F[Either[ProgramError, Unit]] = { (action: RegisterUserAction) =>
     for {
-      maybeUser <- RouterF[F].publish(
-        FindUserAction(action.userId)
-      )
-      unit <- {
+      maybeUser: Option[User] <- publish(FindUserAction(action.userId))
+      unit: Unit <- {
         maybeUser match {
           case Some(user) =>
             MError[F].raiseError(
@@ -30,9 +30,11 @@ object RegisterUserAction {
                 msg = s"user already exists: $user"
               )
             )
-          case None => UserRepoF[F].set(UserId(action.userId), User(action.userId))
+          case None => set(action.userId, action.user)
         }
       }
     } yield Either.right[ProgramError, Unit](unit)
+
   }
+
 }

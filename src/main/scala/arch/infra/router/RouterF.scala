@@ -1,6 +1,6 @@
 package arch.infra.router
 
-import arch.common.Program.{Context, MError, ProgramError}
+import arch.common.Program.{ Context, MError, ProgramError }
 import arch.infra.logging.LoggingLibrary
 
 import scala.collection.mutable
@@ -14,15 +14,24 @@ class RouterF[F[_]: MError](
     }
 )(implicit logger: LoggingLibrary[F])
     extends Router[F] {
-  private val context: Context = Context("router")
+  private val context: Context        = Context("router")
   private val actionNotFoundErrorCode = 1
 
-  private val handlers: mutable.HashMap[Class[_], Action[_] => F[Any]] =
+  private val handlers: mutable.HashMap[Class[_], Action.Handler[F, _]] =
     mutable.HashMap.empty
 
-  override def publish[O, A <: Action[O]](action: A): F[O] =
-    handlers
-      .get(action.getClass) match {
+  private def getHandlerForAction[O, A <: Action[O]](action: A): Option[Action.Handler[F, A]] =
+    handlers.get(action.getClass).map { handler =>
+      handler.asInstanceOf[Action.Handler[F, A]]
+    }
+
+  private def handleAction[O, A <: Action[O]](
+      action: A,
+      handler: Action.Handler[F, A]
+  ): F[O] = handler.handle(action)
+
+  override def publish[O, A <: Action[O]](action: A): F[action.Output] =
+    getHandlerForAction(action) match {
       case Some(handler) => handleAction(action, handler)
       case None =>
         MError[F].raiseError(
@@ -36,51 +45,21 @@ class RouterF[F[_]: MError](
     }
 
   override def subscribe[O, A <: Action[O]: ClassTag](
-      handler: A => F[O]
-  ): Unit = {
+      handler: Action.Handler[F, A]
+  ): F[Unit] = {
     val classTag = implicitly[ClassTag[A]]
     if (handlers.contains(classTag.runtimeClass)) {
       logger.logWarn("handler already subscribed")(
         context.copy(
-          metadata =
-            context.metadata + ("handler_name" -> classTag.runtimeClass.getSimpleName)
+          metadata = context.metadata + ("handler_name" -> classTag.runtimeClass.getSimpleName)
         )
       )
-      ()
     } else {
-      val transformed: Action[_] => F[Any] = (t: Action[_]) =>
-        MError[F].map(handler(t.asInstanceOf[A]))(_.asInstanceOf[Any])
-      handlers.addOne((classTag.runtimeClass -> transformed))
+      handlers.addOne(classTag.runtimeClass -> handler)
     }
+    MError[F].pure(())
   }
 
-  private def handleAction[O, A <: Action[O]](
-      action: A,
-      handler: A => F[Any]
-  ): F[O] = {
-    val before = System.currentTimeMillis()
-    val maybeResponse: F[O] =
-      MError[F].map(handler(action))(_.asInstanceOf[O])
-    val recoverable = MError[F].recoverWith(maybeResponse) {
-      case error: ProgramError =>
-        onFailure(error)
-        recordLatencyInMillis(
-          action.getClass.getSimpleName,
-          before,
-          System.currentTimeMillis()
-        )
-        maybeResponse
-    }
-    MError[F].map(recoverable) { result =>
-      onSuccess(action.getClass.getSimpleName)
-      recordLatencyInMillis(
-        action.getClass.getSimpleName,
-        before,
-        System.currentTimeMillis()
-      )
-      result
-    }
-  }
 }
 
 object RouterF {

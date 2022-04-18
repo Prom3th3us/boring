@@ -4,6 +4,7 @@ import arch.common.Program.ProgramError
 import cats.effect.unsafe.IORuntime
 import com.typesafe.config.{ Config, ConfigFactory }
 import client.domain.user.model.User
+import client.domain.user.model.User._
 import client.domain.user.service.find.FindUserAction
 import client.domain.user.service.register
 import client.domain.user.service.register.RegisterUserAction
@@ -32,7 +33,7 @@ object Runner {
       // EXECUTION
       val router = implicitly[ProgramBuilder[Env]].buildApp(config)
       val actionResult = router.publish(
-        FindUserAction("Prom3th3us")
+        FindUserAction(UserId("Prom3th3us"))
       )
       // OUTPUT
       actionResult.value.unsafeRunSync()
@@ -44,13 +45,13 @@ object Runner {
       val router = implicitly[ProgramBuilder[Env]].buildApp(config)
       for {
         before <- router.publish(
-          FindUserAction("Prom3th3us")
+          FindUserAction(UserId("Prom3th3us"))
         )
         _ <- router.publish(
-          register.RegisterUserAction("Prom3th3us")
+          register.RegisterUserAction(UserId("Prom3th3us"), User("pepe"))
         )
         after <- router.publish(
-          FindUserAction("Prom3th3us")
+          FindUserAction(UserId("Prom3th3us"))
         )
       } yield {
         println("HERE! 1")

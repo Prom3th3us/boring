@@ -30,9 +30,7 @@ object ProgramBuilder {
 
     implicit lazy val router: RouterF[App] = new RouterApp()
     router.subscribe(FindUserAction.handler)
-    router.subscribe(
-      RegisterUserAction.handler
-    )
+    // router.subscribe( RegisterUserAction.handler)
     router
   }
 
@@ -48,9 +46,7 @@ object ProgramBuilder {
     // implicit user service extends interface
     implicit lazy val router: RouterF[Test] = new RouterTest()
     router.subscribe(FindUserAction.handler)
-    router.subscribe(
-      RegisterUserAction.handler
-    )
+    // router.subscribe(RegisterUserAction.handler)
     router
   }
 }

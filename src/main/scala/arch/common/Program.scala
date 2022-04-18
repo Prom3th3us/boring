@@ -2,7 +2,7 @@ package arch.common
 
 import cats.MonadError
 
-import scala.util.{Failure, Success, Try}
+import scala.util.{ Failure, Success, Try }
 
 object Program {
 
