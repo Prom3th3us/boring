@@ -2,12 +2,13 @@ package client.app
 
 import arch.common.Program.ProgramError
 import cats.effect.unsafe.IORuntime
-import com.typesafe.config.{Config, ConfigFactory}
+import com.typesafe.config.{ Config, ConfigFactory }
 import client.domain.user.model.User
 import client.domain.user.service.find.FindUserAction
 import client.domain.user.service.register
 import client.domain.user.service.register.RegisterUserAction
-import client.infrastructure.{ProgramLive}
+import client.infrastructure.{ ProgramLive }
+import arch.common.Program.MError
 
 object Runner {
   import ProgramBuilder._
@@ -17,7 +18,7 @@ object Runner {
   val prod = false
   val config: Config = ConfigFactory.parseMap(
     Map(
-      "user.flag" -> true,
+      "user.flag"  -> true,
       "user.value" -> 1
     ).asJava
   )
@@ -57,6 +58,32 @@ object Runner {
         println(s"after: $after")
       }
       // OUTPUT
+
+      /*
+      case class ExampleRule(id: String) extends Action[Boolean]
+      object ExampleRule {
+        implicit def handler[F[_]: MError]: ExampleRule => F[Boolean] = { (user: ExampleRule) =>
+          MError[F].pure(true)
+        }
+      }
+
+      import arch.infra.router.{ Action, RouterF }
+      case class ReadMessages(id: String) extends Action[Seq[String]]
+      object ReadMessages {
+        implicit def handler[F[_]: MError: RouterF]: ReadMessages => F[Boolean] = { (user: ReadMessages) =>
+
+          def when[F[_], E](e: => Action[Boolean])(b: MError[E]) =
+            MError[F].ifM(
+              RouterF[F].publish(
+                e
+              )
+            )(
+              b,
+              MError[F].raiseError(null)
+            )
+          when(ExampleRule(action.userId))(MError[F] pure Seq("messages"))
+        }
+      } */
 
     }
     println(result)

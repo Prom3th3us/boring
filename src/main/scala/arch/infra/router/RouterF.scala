@@ -43,7 +43,7 @@ class RouterF[F[_]: MError](
       logger.logWarn("handler already subscribed")(
         context.copy(
           metadata =
-            context.metadata + ("handler_name" -> handler.getClass.getSimpleName)
+            context.metadata + ("handler_name" -> classTag.runtimeClass.getSimpleName)
         )
       )
       ()
