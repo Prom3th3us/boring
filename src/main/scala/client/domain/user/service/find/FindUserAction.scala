@@ -8,7 +8,6 @@ import arch.infra.repo.Repo._
 case class FindUserAction(id: UserId) extends Action[Option[User]]
 
 object FindUserAction {
-  implicit def handler[F[_]: UserRepoF]: Action.Handler[F, FindUserAction] = new Action.Handler[F, FindUserAction] {
-    override def handle(action: FindUserAction): F[action.Output] = find(action.id)
-  }
+  implicit def handler[F[_]: UserRepoF]: Action.Handler[F, FindUserAction] =
+    action => find(action.id)
 }
