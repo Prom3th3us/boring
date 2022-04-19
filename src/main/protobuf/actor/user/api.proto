@@ -21,9 +21,6 @@ message AddPersonValue {
   string personId = 2;
 }
 
-
-
-
 message UserGetResponse {
   string id = 1;
   string name = 2;

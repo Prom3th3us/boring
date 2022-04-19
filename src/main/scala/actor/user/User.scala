@@ -27,6 +27,7 @@ class User(context: ValueEntityContext) extends AbstractUser {
       case Left(error)  => effects.error(s"error: ${error}")
       case Right(value) => effects.reply(UserGetResponse(findUserValue.id, value.name))
     }
+
   override def addPerson(currentState: UserState, addPersonValue: AddPersonValue): ValueEntity.Effect[Empty] =
     sdk.user.add(id = addPersonValue.id, name = addPersonValue.personId) match {
       case Left(error)  => effects.error(s"error: ${error}")

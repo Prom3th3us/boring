@@ -1,5 +1,7 @@
-package actor.user
+package actor
 
+import actor.person.Person
+import actor.user.User
 import com.akkaserverless.scalasdk.AkkaServerless
 import org.slf4j.LoggerFactory
 
@@ -10,7 +12,7 @@ import org.slf4j.LoggerFactory
 
 object Main {
 
-  private val log = LoggerFactory.getLogger("actor.user.Main")
+  private val log = LoggerFactory.getLogger("actor.Main")
 
   def createAkkaServerless(): AkkaServerless = {
     // The AkkaServerlessFactory automatically registers any generated Actions, Views or Entities,
@@ -18,6 +20,7 @@ object Main {
     // If you prefer, you may remove this and manually register these components in a
     // `AkkaServerless()` instance.
     AkkaServerlessFactory.withComponents(
+      new Person(_),
       new User(_))
   }
 
