@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+package actor.user.domain;
+
+message UserState {
+  int32 value = 1;
+}
+

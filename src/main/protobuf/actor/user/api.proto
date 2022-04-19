@@ -1,0 +1,44 @@
+// This is the public API offered by your entity.
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+import "akkaserverless/annotations.proto";
+import "google/api/annotations.proto";
+
+package actor.user;
+
+message RegisterUserValue {
+  string id = 1 [(akkaserverless.field).entity_key = true];
+  string name = 2;
+}
+
+message FindUserValue {
+  string id = 1 [(akkaserverless.field).entity_key = true];
+}
+
+message AddPersonValue {
+  string id = 1 [(akkaserverless.field).entity_key = true];
+  string personId = 2;
+}
+
+
+
+
+message UserGetResponse {
+  string id = 1;
+  string name = 2;
+}
+
+service UserService {
+  option (akkaserverless.codegen) = {
+    value_entity: {
+      name: "actor.user.User"
+      entity_type: "user"
+      state: "actor.user.domain.UserState"
+    }
+  };
+
+  rpc register(RegisterUserValue) returns (google.protobuf.Empty);
+  rpc find(FindUserValue) returns (UserGetResponse);
+  rpc addPerson(AddPersonValue) returns (google.protobuf.Empty);
+}

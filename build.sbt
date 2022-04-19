@@ -6,13 +6,13 @@ lazy val root = (project in file("."))
   .dependsOn(shared)
   .settings(scalacOptions += "-Ytasty-reader")
   .settings(
-    organization := "com.example",
+    organization := "actor",
     name         := "Pacman",
     version      := "0.1.0-SNAPSHOT",
     scalaVersion := "2.13.8"
   )
   .settings(
-    libraryDependencies += "com.github.Prom3th3us" % "boring"    % "develop-SNAPSHOT",
+    libraryDependencies += "com.github.Prom3th3us" % "boring"    % "develop-d99a5f66b2-1",
     libraryDependencies += "org.slf4j"             % "slf4j-api" % "2.0.0-alpha7"
   )
 
