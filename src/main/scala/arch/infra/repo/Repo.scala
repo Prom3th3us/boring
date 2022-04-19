@@ -3,9 +3,11 @@ package arch.infra.repo
 trait Repo[F[_]] {
   type Key
   type Value
+
   def set(id: Key, a: Value): F[Unit]
 
   def get(id: Key): F[Option[Value]]
+
 }
 
 object Repo:

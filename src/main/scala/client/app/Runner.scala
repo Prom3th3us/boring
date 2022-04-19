@@ -4,12 +4,17 @@ import arch.common.Program.ProgramError
 import cats.effect.unsafe.IORuntime
 import com.typesafe.config.{ Config, ConfigFactory }
 import client.domain.user.model.User
-import client.domain.user.model.User._
-import client.domain.user.service.find.FindUserAction
-import client.domain.user.service.register
-import client.domain.user.service.register.RegisterUserAction
-import client.infrastructure.{ ProgramLive }
+import client.domain.user.model.User.*
+import client.domain.person.model.Person
+import client.domain.person.model.Person.*
+import client.domain.chat.model.Chat
+import client.domain.chat.model.Chat.*
+import client.domain.user.{ service => userService }
+import client.domain.person.{ service => personService }
+import client.domain.chat.{ service => chatService }
+import client.infrastructure.ProgramLive
 import arch.common.Program.MError
+import client.domain.user.service
 
 object Runner {
   import ProgramBuilder._
@@ -33,7 +38,7 @@ object Runner {
       // EXECUTION
       val router = implicitly[ProgramBuilder[Env]].buildApp(config)
       val actionResult = router.publish(
-        FindUserAction(UserId("Prom3th3us"))
+        userService.Find(UserId("Prom3th3us"))
       )
       // OUTPUT
       actionResult.value.unsafeRunSync()
@@ -43,20 +48,92 @@ object Runner {
       type Env[A] = ProgramLive.Test[A]
       // EXECUTION
       val router = implicitly[ProgramBuilder[Env]].buildApp(config)
+
+      import scala.language.implicitConversions
+      implicit def toUserId(id: String): UserId     = UserId(s"user-$id")
+      implicit def toPersonId(id: String): PersonId = PersonId(s"person-$id")
+      implicit def toChatId(id: String): ChatId     = ChatId(s"person-$id")
+
+      def registerPerson(id: String) = {
+        for {
+          _ <- router.publish(
+            userService.Register(id, User(id, Set.empty[PersonId]))
+          )
+          _ <- router.publish(
+            personService.Register(id, Person(id))
+          )
+          done <- router.publish(
+            userService.AddPerson(id, id)
+          )
+        } yield done
+      }
+
+      val names = Seq(
+        "Franco",
+        "Manuel",
+        "Nacho",
+        "Miguel"
+      )
+
+      println("Registering persons:")
+      names
+        .map(registerPerson)
+        .foreach(println)
+
+      val chatId = ChatId("chat-1")
+      router.publish(
+        chatService.Register(
+          chatId,
+          Chat(Set.empty[PersonId])
+        )
+      )
+
+      println("Adding persons to chat:")
+      names
+        .map { name =>
+          router.publish(
+            chatService.AddPerson(
+              chatId,
+              name
+            )
+          )
+        }
+        .foreach(println)
+
+      def sendMessage(name: PersonId, chatId: ChatId, message: String) =
+        router.publish(
+          chatService.SendMessage(
+            name,
+            chatId,
+            Message("message-id", name.id, message)
+          )
+        )
+
+      val messages = (1 to 3) map { i => s"Hello! - ${i}" }
+      messages.foreach(m => sendMessage(names.head, chatId, m))
+
       for {
-        before <- router.publish(
-          FindUserAction(UserId("Prom3th3us"))
+        message1 <- router.publish(
+          chatService.ReadMessage(names.head, chatId)
         )
-        _ <- router.publish(
-          register.RegisterUserAction(UserId("Prom3th3us"), User("pepe"))
+        message2 <- router.publish(
+          chatService.ReadMessage(names.head, chatId)
         )
-        after <- router.publish(
-          FindUserAction(UserId("Prom3th3us"))
+        message3 <- router.publish(
+          chatService.ReadMessage(names.head, chatId)
         )
       } yield {
-        println("HERE! 1")
-        println(s"before: ${before}")
-        println(s"after: $after")
+        println(s"after: $message1")
+        println(s"after: $message2")
+        println(s"after: $message3")
+
+        for {
+          message4 <- router.publish(
+            chatService.ReadMessage(names.head, chatId)
+          )
+        } yield {
+          println(s"after: $message4")
+        }
       }
       // OUTPUT
 

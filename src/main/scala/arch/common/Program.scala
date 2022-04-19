@@ -19,6 +19,16 @@ object Program {
   )
 
   object ProgramError {
+
+    def simple(text: String) =
+      ProgramError(
+        new Exception("error message: " + text),
+        "error message: " + text,
+        Context("dont bother"), // TODO:
+        -1,
+        Seq()
+      )
+
     def fromThrowable(exception: Throwable): Context => Int => ProgramError =
       ctx =>
         errorCode => {
