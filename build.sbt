@@ -12,7 +12,7 @@ lazy val root = (project in file("."))
     scalaVersion := "2.13.8"
   )
   .settings(
-    libraryDependencies += "com.github.Prom3th3us" % "boring"    % "develop-d99a5f66b2-1",
+    libraryDependencies += "com.github.Prom3th3us" % "boring"    % "29f1daf93f",
     libraryDependencies += "org.slf4j"             % "slf4j-api" % "2.0.0-alpha7"
   )
 
