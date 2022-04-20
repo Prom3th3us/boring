@@ -23,7 +23,7 @@ import scala.language.postfixOps
 class IntegrationSpec extends AnyWordSpec with Matchers with BeforeAndAfterAll with ScalaFutures {
 
   implicit private val patience: PatienceConfig =
-    PatienceConfig(Span(15, Seconds), Span(1500, Millis))
+    PatienceConfig(Span(150, Seconds), Span(15000, Millis))
 
   private val testKit = AkkaServerlessTestKit(Main.createAkkaServerless()).start()
 

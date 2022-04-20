@@ -1,19 +1,9 @@
-lazy val shared = project
-  .settings(scalaVersion := "3.1.2")
-
-resolvers += "jitpack" at "https://jitpack.io"
 lazy val root = (project in file("."))
-  .dependsOn(shared)
-  .settings(scalacOptions += "-Ytasty-reader")
   .settings(
     organization := "actor",
     name         := "Pacman",
     version      := "0.1.0-SNAPSHOT",
     scalaVersion := "2.13.8"
-  )
-  .settings(
-    libraryDependencies += "com.github.Prom3th3us" % "boring"    % "29f1daf93f",
-    libraryDependencies += "org.slf4j"             % "slf4j-api" % "2.0.0-alpha7"
   )
 
 enablePlugins(AkkaserverlessPlugin, JavaAppPackaging, DockerPlugin)
