@@ -1,9 +1,10 @@
 syntax = "proto3";
+import "akkaserverless/annotations.proto";
 
 package actor.user.domain;
 
 message UserCreated {
-  string user_id = 1;
+  string user_id = 1 [(akkaserverless.field).entity_key = true];
   string name = 2;
 }
 
