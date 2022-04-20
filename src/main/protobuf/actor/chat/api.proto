@@ -1,0 +1,52 @@
+// This is the public API offered by your entity.
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+import "akkaserverless/annotations.proto";
+import "google/api/annotations.proto";
+
+package actor.chat;
+
+message AddMessageCommand {
+  string chat_id = 1 [(akkaserverless.field).entity_key = true];
+  string message = 2;
+}
+
+message MessageView {
+  string text = 1;
+}
+
+message ChatView {
+  repeated MessageView items = 1;
+}
+
+message GetChatCommand {
+  string chat_id = 1 [(akkaserverless.field).entity_key = true];
+}
+
+service ChatService {
+  option (akkaserverless.codegen) = {
+    event_sourced_entity: {
+      name: "actor.chat.Chat"
+      entity_type: "chat"
+      state: "actor.chat.domain.ChatState",
+      events: [
+        "actor.chat.domain.MessageAdded"
+      ]
+    }
+  };
+
+  rpc AddMessage (AddMessageCommand) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/chat/{chat_id}/add"
+      body: "*"
+    };
+  }
+
+  rpc GetChat (GetChatCommand) returns (ChatView) {
+    option (google.api.http) = {
+      get: "/chat/{chat_id}"
+    };
+  }
+
+}

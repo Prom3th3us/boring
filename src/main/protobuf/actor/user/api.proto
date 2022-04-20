@@ -4,41 +4,53 @@ syntax = "proto3";
 import "google/protobuf/empty.proto";
 import "akkaserverless/annotations.proto";
 import "google/api/annotations.proto";
+import "actor/person/api.proto";
+import "actor/person/domain/state.proto";
 
 package actor.user;
 
-message RegisterUserValue {
-  string id = 1 [(akkaserverless.field).entity_key = true];
+message CreateUserCommand {
+  string user_id = 1 [(akkaserverless.field).entity_key = true];
   string name = 2;
 }
 
-message FindUserValue {
-  string id = 1 [(akkaserverless.field).entity_key = true];
+message UserView {
+  string name = 1;
 }
 
-message AddPersonValue {
-  string id = 1 [(akkaserverless.field).entity_key = true];
-  string personId = 2;
-}
-
-
-
-
-message UserGetResponse {
-  string id = 1;
-  string name = 2;
+message GetUserCommand {
+  string user_id = 1 [(akkaserverless.field).entity_key = true];
 }
 
 service UserService {
   option (akkaserverless.codegen) = {
-    value_entity: {
+    event_sourced_entity: {
       name: "actor.user.User"
       entity_type: "user"
-      state: "actor.user.domain.UserState"
+      state: "actor.user.domain.UserState",
+      events: [
+        "actor.user.domain.UserCreated"
+      ]
     }
   };
 
-  rpc register(RegisterUserValue) returns (google.protobuf.Empty);
-  rpc find(FindUserValue) returns (UserGetResponse);
-  rpc addPerson(AddPersonValue) returns (google.protobuf.Empty);
+  rpc CreateUser (CreateUserCommand) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/user/{user_id}"
+      body: "*"
+    };
+  }
+
+  rpc GetUser (GetUserCommand) returns (UserView) {
+    option (google.api.http) = {
+      get: "/user/{user_id}"
+    };
+  }
+
+  rpc AddPerson(person.domain.PersonCreated) returns (google.protobuf.Empty) {
+    option (akkaserverless.method).eventing.in = {
+      event_sourced_entity: "person"
+    };
+  }
+
 }

@@ -2,7 +2,12 @@ syntax = "proto3";
 
 package actor.user.domain;
 
+message UserCreated {
+  string user_id = 1;
+  string name = 2;
+}
+
 message UserState {
-  int32 value = 1;
+  string name = 1;
 }
 

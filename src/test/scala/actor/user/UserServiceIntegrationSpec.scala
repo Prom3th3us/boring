@@ -1,5 +1,6 @@
 package actor.user
 
+import actor.Main
 import akka.actor.ActorSystem
 import com.akkaserverless.scalasdk.testkit.AkkaServerlessTestKit
 import com.google.protobuf.empty.Empty

@@ -1,45 +1,41 @@
 package actor.user
 
+import actor.user._
 import actor.user
-import actor.user.domain.UserState
-import com.akkaserverless.scalasdk.testkit.ValueEntityResult
-import com.akkaserverless.scalasdk.valueentity.ValueEntity
+import actor.user.domain.UserCreated
+import com.akkaserverless.scalasdk.eventsourcedentity.EventSourcedEntity
+import com.akkaserverless.scalasdk.testkit.EventSourcedResult
 import com.google.protobuf.empty.Empty
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
-class UserSpec
-    extends AnyWordSpec
-    with Matchers {
+// This class was initially generated based on the .proto definition by Akka Serverless tooling.
+//
+// As long as this file exists it will not be overwritten: you can maintain it yourself,
+// or delete it so it is regenerated as needed.
 
-  "User" must {
+class UserSpec extends AnyWordSpec with Matchers {
+  "The User" should {
 
-    "have example test that can be removed" in {
-      val testKit = UserTestKit(new User(_))
-      // use the testkit to execute a command
-      // and verify final updated state:
-      // val result = testKit.someOperation(SomeRequest)
-      // verify the response
-      // val actualResponse = result.getReply()
-      // actualResponse shouldBe expectedResponse
-      // verify the final state after the command
-      // testKit.currentState() shouldBe expectedState
+    "correctly process commands of type CreateUserCommand" in {
+      val testKit                         = UserTestKit(new User(_))
+      val userId                          = "user A"
+      val name                            = "user name"
+      val done: EventSourcedResult[Empty] = testKit.createUser(CreateUserCommand(userId, name))
+      done.reply shouldBe Empty()
+      done.events shouldBe Seq(UserCreated(userId, name))
     }
 
-    "handle command register" in {
+    "correctly process commands of type GetUser" in {
       val testKit = UserTestKit(new User(_))
-      // val result = testKit.register(RegisterUserValue(...))
-    }
+      val userId  = "user A"
+      val name    = "user name"
+      val result: EventSourcedResult[UserView] = {
+        testKit.createUser(CreateUserCommand(userId, name))
+        testKit.getUser(GetUserCommand(userId))
+      }
 
-    "handle command find" in {
-      val testKit = UserTestKit(new User(_))
-      // val result = testKit.find(FindUserValue(...))
+      result.reply shouldBe UserView(name)
     }
-
-    "handle command addPerson" in {
-      val testKit = UserTestKit(new User(_))
-      // val result = testKit.addPerson(AddPersonValue(...))
-    }
-
   }
 }

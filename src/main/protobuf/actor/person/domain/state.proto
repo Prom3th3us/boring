@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package actor.person.domain;
+
+message PersonCreated {
+  string user_id = 1;
+  string person_id = 2;
+  string name = 3;
+}
+
+message PersonState {
+  string name = 3;
+}
+

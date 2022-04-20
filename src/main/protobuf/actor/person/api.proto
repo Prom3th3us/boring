@@ -1,0 +1,57 @@
+// This is the public API offered by your entity.
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+import "akkaserverless/annotations.proto";
+import "google/api/annotations.proto";
+
+package actor.person;
+
+/*
+about multiple entity keys usage:
+https://developer.lightbend.com/docs/akka-serverless/javascript/proto.html
+Akka Serverless extracts the value of these fields in order to route messages to the right Entity.
+If more than one field is specified as an Entity key, the fields are concatenated together.
+Akka Serverless serializes Entity keys to strings.
+*/
+message CreatePersonCommand {
+  string user_id = 1 [(akkaserverless.field).entity_key = true];
+  string person_id = 2 [(akkaserverless.field).entity_key = true];
+  string name = 3;
+}
+
+message PersonView {
+  string name = 1;
+}
+
+message GetPersonCommand {
+  string user_id = 1 [(akkaserverless.field).entity_key = true];
+  string person_id = 2 [(akkaserverless.field).entity_key = true];
+}
+
+service PersonService {
+  option (akkaserverless.codegen) = {
+    event_sourced_entity: {
+      name: "actor.person.Person"
+      entity_type: "person"
+      state: "actor.person.domain.PersonState",
+      events: [
+        "actor.person.domain.PersonCreated"
+      ]
+    }
+  };
+
+  rpc CreatePerson (CreatePersonCommand) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/user/{user_id}/person/{person_id}"
+      body: "*"
+    };
+  }
+
+  rpc getPerson (GetPersonCommand) returns (PersonView) {
+    option (google.api.http) = {
+      get: "/user/{user_id}/person/{person_id}"
+    };
+  }
+
+}

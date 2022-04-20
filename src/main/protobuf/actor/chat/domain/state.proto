@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package actor.chat.domain;
+
+message Message {
+  string text = 1;
+}
+
+message MessageAdded {
+  string chat_id = 1;
+  Message message = 2;
+}
+
+message ChatState {
+  repeated Message messages = 1;
+}
+

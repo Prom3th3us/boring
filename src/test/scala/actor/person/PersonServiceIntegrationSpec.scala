@@ -1,5 +1,6 @@
-package user
+package actor.person
 
+import actor.Main
 import akka.actor.ActorSystem
 import com.akkaserverless.scalasdk.testkit.AkkaServerlessTestKit
 import com.google.protobuf.empty.Empty
@@ -16,7 +17,7 @@ import org.scalatest.wordspec.AnyWordSpec
 // As long as this file exists it will not be overwritten: you can maintain it yourself,
 // or delete it so it is regenerated as needed.
 
-class UserServiceIntegrationSpec
+class PersonServiceIntegrationSpec
     extends AnyWordSpec
     with Matchers
     with BeforeAndAfterAll
@@ -27,9 +28,9 @@ class UserServiceIntegrationSpec
 
   private val testKit = AkkaServerlessTestKit(Main.createAkkaServerless()).start()
 
-  private val client = testKit.getGrpcClient(classOf[UserService])
+  private val client = testKit.getGrpcClient(classOf[PersonService])
 
-  "UserService" must {
+  "PersonService" must {
 
     "have example test that can be removed" in {
       // use the gRPC client to send requests to the

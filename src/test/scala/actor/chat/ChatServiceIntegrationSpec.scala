@@ -1,5 +1,6 @@
-package com.example
+package actor.chat
 
+import actor.Main
 import akka.actor.ActorSystem
 import com.akkaserverless.scalasdk.testkit.AkkaServerlessTestKit
 import com.google.protobuf.empty.Empty
@@ -16,20 +17,16 @@ import org.scalatest.wordspec.AnyWordSpec
 // As long as this file exists it will not be overwritten: you can maintain it yourself,
 // or delete it so it is regenerated as needed.
 
-class UserServiceIntegrationSpec
-    extends AnyWordSpec
-    with Matchers
-    with BeforeAndAfterAll
-    with ScalaFutures {
+class ChatServiceIntegrationSpec extends AnyWordSpec with Matchers with BeforeAndAfterAll with ScalaFutures {
 
   implicit private val patience: PatienceConfig =
     PatienceConfig(Span(5, Seconds), Span(500, Millis))
 
   private val testKit = AkkaServerlessTestKit(Main.createAkkaServerless()).start()
 
-  private val client = testKit.getGrpcClient(classOf[UserService])
+  private val client = testKit.getGrpcClient(classOf[ChatService])
 
-  "UserService" must {
+  "ChatService" must {
 
     "have example test that can be removed" in {
       // use the gRPC client to send requests to the
