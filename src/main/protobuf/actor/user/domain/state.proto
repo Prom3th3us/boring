@@ -8,7 +8,13 @@ message UserCreated {
   string name = 2;
 }
 
+message AddedPerson {
+  string user_id = 1 [(akkaserverless.field).entity_key = true];
+  string person_id = 2;
+}
+
 message UserState {
   string name = 1;
+  repeated string persons = 2;
 }
 

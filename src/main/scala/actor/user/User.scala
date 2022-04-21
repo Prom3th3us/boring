@@ -2,8 +2,7 @@ package actor.user
 
 import actor.person.domain.PersonCreated
 import actor.user
-import actor.user.domain.UserCreated
-import actor.user.domain.UserState
+import actor.user.domain._
 import com.akkaserverless.scalasdk.eventsourcedentity.EventSourcedEntity
 import com.akkaserverless.scalasdk.eventsourcedentity.EventSourcedEntityContext
 import com.google.protobuf.empty.Empty
@@ -32,7 +31,8 @@ class User(context: EventSourcedEntityContext) extends AbstractUser {
   override def getUser(currentState: UserState, getUserCommand: GetUserCommand): EventSourcedEntity.Effect[UserView] =
     effects.reply(
       UserView(
-        name = currentState.name
+        name = currentState.name,
+        persons = currentState.persons
       )
     )
 
@@ -41,8 +41,26 @@ class User(context: EventSourcedEntityContext) extends AbstractUser {
       name = userCreated.name
     )
 
+  override def addedPerson(currentState: UserState, addedPerson: AddedPerson): UserState = {
+    println("User.addedPerson -- before", "   ", addedPerson.userId, currentState.name, currentState.persons)
+
+    val a = UserState(
+      name = currentState.name,
+      persons = Seq(addedPerson.personId)
+    )
+    println("User.addedPerson -- after", "   ", addedPerson.userId, a.name, a.persons)
+
+    a
+  }
+
   override def addPerson(currentState: UserState, personCreated: PersonCreated): EventSourcedEntity.Effect[Empty] = {
-    println("OVER HERE at addPerson from User!")
-    effects.reply(Empty())
+    effects
+      .emitEvent(
+        AddedPerson(
+          personCreated.userId,
+          personCreated.personId
+        )
+      )
+      .thenNoReply
   }
 }

@@ -16,6 +16,7 @@ message CreateUserCommand {
 
 message UserView {
   string name = 1;
+  repeated string persons = 2;
 }
 
 message GetUserCommand {
@@ -29,7 +30,8 @@ service UserService {
       entity_type: "user"
       state: "actor.user.domain.UserState",
       events: [
-        "actor.user.domain.UserCreated"
+        "actor.user.domain.UserCreated",
+        "actor.user.domain.AddedPerson"
       ]
     }
   };
