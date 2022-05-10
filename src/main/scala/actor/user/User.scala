@@ -61,6 +61,6 @@ class User(context: EventSourcedEntityContext) extends AbstractUser {
           personCreated.personId
         )
       )
-      .thenNoReply
+      .thenReply(_ => Empty())
   }
 }
