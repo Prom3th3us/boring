@@ -15,6 +15,7 @@ com.akkaserverless.proxy.UserFunctionErrors$ReportableError:
 ```
 
 The main consequence this has over the codebase is *coupling*:
+
 **Now because the producer must reference the .proto definition of the consumer
 a producer cannot serve messages to a topic that is going to be consumed
 by multiple different consumers.**
