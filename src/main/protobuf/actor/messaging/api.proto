@@ -1,0 +1,28 @@
+// This is the public API offered by your entity.
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+import "akkaserverless/annotations.proto";
+import "google/api/annotations.proto";
+import "actor/messaging/domain/dto.proto";
+import "actor/user/domain/state.proto";
+
+package actor.messaging;
+
+
+
+service MessagingService {
+  option (akkaserverless.service) = {
+    type : SERVICE_TYPE_ACTION
+  };
+
+  rpc SendMessage (actor.messaging.domain.SendMessageDtoM) returns (actor.user.domain.SendMessageDto) {
+    option (google.api.http) = {
+      post: "/message"
+      body: "*"
+    };
+    option (akkaserverless.method).eventing.out = {
+      topic: "message"
+    };
+  }
+}

@@ -6,6 +6,8 @@ import "akkaserverless/annotations.proto";
 import "google/api/annotations.proto";
 import "actor/person/api.proto";
 import "actor/person/domain/state.proto";
+import "actor/user/domain/state.proto";
+import "actor/messaging/domain/dto.proto";
 
 package actor.user;
 
@@ -17,11 +19,13 @@ message CreateUserCommand {
 message UserView {
   string name = 1;
   repeated string persons = 2;
+  repeated string messages = 3;
 }
 
 message GetUserCommand {
   string user_id = 1 [(akkaserverless.field).entity_key = true];
 }
+
 
 service UserService {
   option (akkaserverless.codegen) = {
@@ -31,7 +35,8 @@ service UserService {
       state: "actor.user.domain.UserState",
       events: [
         "actor.user.domain.UserCreated",
-        "actor.user.domain.AddedPerson"
+        "actor.user.domain.AddedPerson",
+        "actor.user.domain.ReceiveMessageDto"
       ]
     }
   };
@@ -54,5 +59,12 @@ service UserService {
       event_sourced_entity: "person"
     };
   }
+
+  rpc ReceiveMessage (actor.user.domain.SendMessageDto) returns (google.protobuf.Empty) {
+    option (akkaserverless.method).eventing.in = {
+      topic: "message"
+    };
+  }
+
 
 }

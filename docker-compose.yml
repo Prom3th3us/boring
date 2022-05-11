@@ -1,8 +1,8 @@
 version: "3"
 services:
   akka-serverless-proxy:
-    image: gcr.io/akkaserverless-public/akkaserverless-proxy:0.8.10
-    command: -Dconfig.resource=dev-mode.conf -Dakkaserverless.proxy.eventing.support=google-pubsub-emulator
+    image: gcr.io/akkaserverless-public/akkaserverless-proxy:0.8.11
+    command: -Dconfig.resource=dev-mode.conf -Dakkaserverless.proxy.eventing.support=kafka
     ports:
       - "9000:9000"
     extra_hosts:
@@ -10,13 +10,38 @@ services:
     environment:
       USER_FUNCTION_HOST: ${USER_FUNCTION_HOST:-host.docker.internal}
       USER_FUNCTION_PORT: ${USER_FUNCTION_PORT:-8080}
-      PUBSUB_EMULATOR_HOST: gcloud-pubsub-emulator
-      # Uncomment to disable the JWT dev secret
-      # JWT_DEV_SECRET: "false"
-      # Uncomment to set the JWT dev secret issuer
-      # JWT_DEV_SECRET_ISSUER: "my-issuer"
-  gcloud-pubsub-emulator:
-    image: gcr.io/google.com/cloudsdktool/cloud-sdk:341.0.0
-    command: gcloud beta emulators pubsub start --project=test --host-port=0.0.0.0:8085
+      BROKER_CONFIG_FILE: /conf/kafka.properties
+    volumes:
+      - ./conf:/conf
+    depends_on:
+      - redpanda
+
+
+  redpanda:
+    command:
+      - redpanda
+      - start
+      - --smp
+      - '1'
+      - --reserve-memory
+      - 0M
+      - --overprovisioned
+      - --node-id
+      - '0'
+      - --kafka-addr
+      - PLAINTEXT://0.0.0.0:29092,OUTSIDE://0.0.0.0:9092
+      - --advertise-kafka-addr
+      - PLAINTEXT://redpanda:29092,OUTSIDE://localhost:9092
+    image: docker.vectorized.io/vectorized/redpanda:v21.9.5
+    container_name: redpanda
     ports:
-      - 8085:8085
+      - 9092:9092
+      - 29092:29092
+      - 8082:8082
+
+
+
+  ubuntu:
+    container_name: ubuntu
+    image: ubuntu
+    command: sleep 1d

@@ -6,7 +6,7 @@ import actor.user.domain._
 import com.akkaserverless.scalasdk.eventsourcedentity.EventSourcedEntity
 import com.akkaserverless.scalasdk.eventsourcedentity.EventSourcedEntityContext
 import com.google.protobuf.empty.Empty
-
+import actor.messaging.domain.SendMessageDtoM
 // This class was initially generated based on the .proto definition by Akka Serverless tooling.
 //
 // As long as this file exists it will not be overwritten: you can maintain it yourself,
@@ -14,6 +14,28 @@ import com.google.protobuf.empty.Empty
 
 class User(context: EventSourcedEntityContext) extends AbstractUser {
   override def emptyState: UserState = UserState()
+
+  override def receiveMessage(
+      currentState: UserState,
+      sendMessageDto: SendMessageDto
+  ): EventSourcedEntity.Effect[Empty] = {
+    println(s"[DEBUG] User.receiveMessage ${sendMessageDto.userId} received ${sendMessageDto.message}")
+    effects
+      .emitEvent(
+        ReceiveMessageDto(
+          userId = sendMessageDto.userId,
+          message = sendMessageDto.message
+        )
+      )
+      .thenReply(_ => Empty())
+  }
+
+  override def receiveMessageDto(currentState: UserState, receiveMessageDto: ReceiveMessageDto): UserState = {
+    println(s"[DEBUG] User.receiveMessageDto ${receiveMessageDto.userId} received ${receiveMessageDto.message}")
+    currentState.copy(
+      messages = currentState.messages appended receiveMessageDto.message
+    )
+  }
 
   override def createUser(
       currentState: UserState,
@@ -32,7 +54,8 @@ class User(context: EventSourcedEntityContext) extends AbstractUser {
     effects.reply(
       UserView(
         name = currentState.name,
-        persons = currentState.persons
+        persons = currentState.persons,
+        messages = currentState.messages
       )
     )
 

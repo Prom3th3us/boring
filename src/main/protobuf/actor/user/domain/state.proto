@@ -13,8 +13,21 @@ message AddedPerson {
   string person_id = 2;
 }
 
+
+message SendMessageDto {
+  string user_id = 1 [(akkaserverless.field).entity_key = true];
+  string message = 2;
+}
+
+
+message ReceiveMessageDto {
+  string user_id = 1 [(akkaserverless.field).entity_key = true];
+  string message = 2;
+}
+
 message UserState {
   string name = 1;
   repeated string persons = 2;
+  repeated string messages = 3;
 }
 
