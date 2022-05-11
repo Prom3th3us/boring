@@ -4,19 +4,22 @@ syntax = "proto3";
 import "google/protobuf/empty.proto";
 import "akkaserverless/annotations.proto";
 import "google/api/annotations.proto";
-import "actor/messaging/domain/dto.proto";
 import "actor/user/domain/state.proto";
 
 package actor.messaging;
 
 
+message SendMessageDtoM {
+  string user_id = 1 [(akkaserverless.field).entity_key = true];
+  string message = 2;
+}
 
 service MessagingService {
   option (akkaserverless.service) = {
     type : SERVICE_TYPE_ACTION
   };
 
-  rpc SendMessage (actor.messaging.domain.SendMessageDtoM) returns (actor.user.domain.SendMessageDto) {
+  rpc SendMessage (actor.messaging.SendMessageDtoM) returns (actor.messaging.SendMessageDtoM) {
     option (google.api.http) = {
       post: "/message"
       body: "*"

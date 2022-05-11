@@ -11,16 +11,13 @@ import com.akkaserverless.scalasdk.action.ActionCreationContext
 class MessagingServiceAction(creationContext: ActionCreationContext) extends AbstractMessagingServiceAction {
 
   override def sendMessage(
-      sendMessageCommand: actor.messaging.domain.SendMessageDtoM
-  ): Action.Effect[actor.user.domain.SendMessageDto] = {
+      sendMessageCommand: actor.messaging.SendMessageDtoM
+  ): Action.Effect[actor.messaging.SendMessageDtoM] = {
     println(
       s"[DEBUG] MessagingServiceAction.sendMessage ${sendMessageCommand.userId} sent ${sendMessageCommand.message}"
     )
     effects.reply(
-      actor.user.domain.SendMessageDto(
-        userId = sendMessageCommand.userId,
-        message = sendMessageCommand.message
-      )
+      sendMessageCommand
     )
   }
 }

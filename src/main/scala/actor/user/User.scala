@@ -6,7 +6,7 @@ import actor.user.domain._
 import com.akkaserverless.scalasdk.eventsourcedentity.EventSourcedEntity
 import com.akkaserverless.scalasdk.eventsourcedentity.EventSourcedEntityContext
 import com.google.protobuf.empty.Empty
-import actor.messaging.domain.SendMessageDtoM
+import actor.messaging.SendMessageDtoM
 // This class was initially generated based on the .proto definition by Akka Serverless tooling.
 //
 // As long as this file exists it will not be overwritten: you can maintain it yourself,
@@ -17,7 +17,7 @@ class User(context: EventSourcedEntityContext) extends AbstractUser {
 
   override def receiveMessage(
       currentState: UserState,
-      sendMessageDto: SendMessageDto
+      sendMessageDto: actor.messaging.SendMessageDtoM
   ): EventSourcedEntity.Effect[Empty] = {
     println(s"[DEBUG] User.receiveMessage ${sendMessageDto.userId} received ${sendMessageDto.message}")
     effects

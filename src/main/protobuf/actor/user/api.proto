@@ -7,7 +7,7 @@ import "google/api/annotations.proto";
 import "actor/person/api.proto";
 import "actor/person/domain/state.proto";
 import "actor/user/domain/state.proto";
-import "actor/messaging/domain/dto.proto";
+import "actor/messaging/api.proto";
 
 package actor.user;
 
@@ -60,7 +60,7 @@ service UserService {
     };
   }
 
-  rpc ReceiveMessage (actor.user.domain.SendMessageDto) returns (google.protobuf.Empty) {
+  rpc ReceiveMessage (actor.messaging.SendMessageDtoM) returns (google.protobuf.Empty) {
     option (akkaserverless.method).eventing.in = {
       topic: "message"
     };
