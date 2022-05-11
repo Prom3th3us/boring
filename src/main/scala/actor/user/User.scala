@@ -17,7 +17,7 @@ class User(context: EventSourcedEntityContext) extends AbstractUser {
 
   override def receiveMessage(
       currentState: UserState,
-      sendMessageDto: SendMessageDto
+      sendMessageDto: actor.messaging.domain.SendMessageDtoM
   ): EventSourcedEntity.Effect[Empty] = {
     println(s"[DEBUG] User.receiveMessage ${sendMessageDto.userId} received ${sendMessageDto.message}")
     effects

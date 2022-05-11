@@ -12,15 +12,12 @@ class MessagingServiceAction(creationContext: ActionCreationContext) extends Abs
 
   override def sendMessage(
       sendMessageCommand: actor.messaging.domain.SendMessageDtoM
-  ): Action.Effect[actor.user.domain.SendMessageDto] = {
+  ): Action.Effect[actor.messaging.domain.SendMessageDtoM] = {
     println(
       s"[DEBUG] MessagingServiceAction.sendMessage ${sendMessageCommand.userId} sent ${sendMessageCommand.message}"
     )
     effects.reply(
-      actor.user.domain.SendMessageDto(
-        userId = sendMessageCommand.userId,
-        message = sendMessageCommand.message
-      )
+      sendMessageCommand
     )
   }
 }

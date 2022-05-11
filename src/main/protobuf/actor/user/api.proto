@@ -60,7 +60,7 @@ service UserService {
     };
   }
 
-  rpc ReceiveMessage (actor.user.domain.SendMessageDto) returns (google.protobuf.Empty) {
+  rpc ReceiveMessage (actor.messaging.domain.SendMessageDtoM) returns (google.protobuf.Empty) {
     option (akkaserverless.method).eventing.in = {
       topic: "message"
     };

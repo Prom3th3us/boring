@@ -16,7 +16,7 @@ service MessagingService {
     type : SERVICE_TYPE_ACTION
   };
 
-  rpc SendMessage (actor.messaging.domain.SendMessageDtoM) returns (actor.user.domain.SendMessageDto) {
+  rpc SendMessage (actor.messaging.domain.SendMessageDtoM) returns (actor.messaging.domain.SendMessageDtoM) {
     option (google.api.http) = {
       post: "/message"
       body: "*"

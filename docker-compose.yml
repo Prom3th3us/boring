@@ -39,9 +39,3 @@ services:
       - 29092:29092
       - 8082:8082
 
-
-
-  ubuntu:
-    container_name: ubuntu
-    image: ubuntu
-    command: sleep 1d
