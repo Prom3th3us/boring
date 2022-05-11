@@ -14,6 +14,12 @@ com.akkaserverless.proxy.UserFunctionErrors$ReportableError:
     [topic: \"message\"].
 ```
 
+The main consequence this has over the codebase is *coupling*:
+**Now because the producer must reference the .proto definition of the consumer
+a producer cannot serve messages to a topic that is going to be consumed
+by multiple different consumers.**
+
+
 It seems like you must publish to Kafka using the .proto
 definition defined by the receiver of the message.
 
