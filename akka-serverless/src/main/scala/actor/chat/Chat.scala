@@ -1,6 +1,15 @@
 package actor.chat
 
-import actor.chat.domain.{ ChatState, Message, MessageAdded }
+import actor.chat.domain.{
+  AdminAdded,
+  AdminRemoved,
+  ChatState,
+  CreatedChat,
+  Message,
+  MessageAdded,
+  UserAdded,
+  UserRemoved
+}
 import com.akkaserverless.scalasdk.eventsourcedentity.EventSourcedEntity
 import com.akkaserverless.scalasdk.eventsourcedentity.EventSourcedEntityContext
 import com.google.protobuf.empty.Empty
@@ -12,12 +21,30 @@ import com.google.protobuf.empty.Empty
 
 class Chat(context: EventSourcedEntityContext) extends AbstractChat {
   override def emptyState: ChatState =
+    ChatState()
+
+  override def createChat(currentState: ChatState, cmd: CreateChat): EventSourcedEntity.Effect[Empty] = {
+    if (currentState != emptyState)
+      effects.error("Chat already created")
+    else
+      effects
+        .emitEvent(
+          CreatedChat(
+            cmd.chatId,
+            cmd.admin
+          )
+        )
+        .thenReply(_ => Empty())
+  }
+
+  override def createdChat(currentState: ChatState, evt: CreatedChat): ChatState =
     ChatState(
-      messages = Seq.empty[Message]
+      admins = Seq(evt.admin)
     )
+
   override def addMessage(
       currentState: ChatState,
-      addMessageCommand: AddMessageCommand
+      addMessageCommand: AddMessage
   ): EventSourcedEntity.Effect[Empty] =
     effects
       .emitEvent(
@@ -26,9 +53,9 @@ class Chat(context: EventSourcedEntityContext) extends AbstractChat {
           message = Option(Message(addMessageCommand.message))
         )
       )
-      .thenReply(state => Empty())
+      .thenReply(_ => Empty())
 
-  override def getChat(currentState: ChatState, getChatCommand: GetChatCommand): EventSourcedEntity.Effect[ChatView] =
+  override def getChat(currentState: ChatState, getChatCommand: GetChat): EventSourcedEntity.Effect[ChatView] =
     effects.reply(
       ChatView(
         items = currentState.messages.map(_.text).map(t => MessageView(t))
@@ -43,4 +70,85 @@ class Chat(context: EventSourcedEntityContext) extends AbstractChat {
           messages = currentState.messages :+ Message(message.text)
         )
     }
+
+  override def addUser(currentState: ChatState, cmd: AddUser): EventSourcedEntity.Effect[Empty] = {
+    if ((currentState.admins.toSet union cmd.signedBy.toSet).isEmpty)
+      effects.error("This operation needs an admin signature")
+    else
+      effects
+        .emitEvent(
+          UserAdded(
+            cmd.chatId,
+            cmd.userId,
+            cmd.signedBy
+          )
+        )
+        .thenReply(_ => Empty())
+  }
+
+  override def deleteUser(currentState: ChatState, cmd: RemoveUser): EventSourcedEntity.Effect[Empty] =
+    if ((currentState.admins.toSet union cmd.signedBy.toSet).isEmpty)
+      effects.error("This operation needs an admin signature")
+    else
+      effects
+        .emitEvent(
+          UserRemoved(
+            cmd.chatId,
+            cmd.userId,
+            cmd.signedBy
+          )
+        )
+        .thenReply(_ => Empty())
+
+  override def addAdmin(currentState: ChatState, cmd: AddAdmin): EventSourcedEntity.Effect[Empty] =
+    if ((currentState.admins.toSet union cmd.signedBy.toSet).isEmpty)
+      effects.error("This operation needs an admin signature")
+    else
+      effects
+        .emitEvent(
+          AdminAdded(
+            cmd.chatId,
+            cmd.userId,
+            cmd.signedBy
+          )
+        )
+        .thenReply(_ => Empty())
+
+  override def deleteAdmin(
+      currentState: ChatState,
+      cmd: RemoveAdmin
+  ): EventSourcedEntity.Effect[Empty] =
+    if ((currentState.admins.toSet union cmd.signedBy.toSet).isEmpty)
+      effects.error("This operation needs an admin signature")
+    else
+      effects
+        .emitEvent(
+          AdminRemoved(
+            cmd.chatId,
+            cmd.userId,
+            cmd.signedBy
+          )
+        )
+        .thenReply(_ => Empty())
+
+  override def adminAdded(currentState: ChatState, evt: AdminAdded): ChatState =
+    currentState.copy(
+      admins = currentState.admins :+ evt.userId
+    )
+
+  override def adminRemoved(currentState: ChatState, evt: AdminRemoved): ChatState =
+    currentState.copy(
+      admins = currentState.admins.filterNot(_ == evt.userId)
+    )
+
+  override def userAdded(currentState: ChatState, evt: UserAdded): ChatState =
+    currentState.copy(
+      users = currentState.users :+ evt.userId
+    )
+
+  override def userRemoved(currentState: ChatState, evt: UserRemoved): ChatState =
+    currentState.copy(
+      admins = currentState.admins.filterNot(_ == evt.userId)
+    )
+
 }

@@ -26,6 +26,62 @@ message GetUserCommand {
   string user_id = 1 [(akkaserverless.field).entity_key = true];
 }
 
+message AddChatInvitation {
+  string user_id = 1 [(akkaserverless.field).entity_key = true];
+  string chat_id = 2;
+}
+
+message DeleteChatInvitation {
+  string user_id = 1 [(akkaserverless.field).entity_key = true];
+  string chat_id = 2;
+}
+
+message AcceptChatInvitation {
+  string user_id = 1 [(akkaserverless.field).entity_key = true];
+  string chat_id = 2;
+}
+
+message RefuseChatInvitation {
+  string user_id = 1 [(akkaserverless.field).entity_key = true];
+  string chat_id = 2;
+}
+
+message AddContactInvitation {
+  string user_id = 1 [(akkaserverless.field).entity_key = true];
+  string contact = 2;
+}
+
+message DeleteContactInvitation {
+  string user_id = 1 [(akkaserverless.field).entity_key = true];
+  string contact = 2;
+}
+
+message AddContact {
+  string user_id = 1 [(akkaserverless.field).entity_key = true];
+  string contact = 2;
+}
+
+message DeleteContact {
+  string user_id = 1 [(akkaserverless.field).entity_key = true];
+  string contact = 2;
+}
+
+message ListContactsInvitations {
+  string user_id = 1 [(akkaserverless.field).entity_key = true];
+}
+
+message ListContacts {
+  string user_id = 1 [(akkaserverless.field).entity_key = true];
+}
+
+
+message Contacts {
+  repeated string contacts = 1;
+}
+
+message ContactInvites {
+  repeated string invites = 1;
+}
 
 service UserService {
   option (akkaserverless.codegen) = {
@@ -36,35 +92,110 @@ service UserService {
       events: [
         "actor.user.domain.UserCreated",
         "actor.user.domain.AddedPerson",
-        "actor.user.domain.ReceiveMessageDto"
+        "actor.user.domain.ReceiveMessageDto",
+        "actor.user.domain.AddedContact",
+        "actor.user.domain.AddedContactInvitation",
+        "actor.user.domain.DeletedContact",
+        "actor.user.domain.DeletedContactInvitation",
+        "actor.user.domain.AddedChatInvitation",
+        "actor.user.domain.RefusedChatInvitation",
+        "actor.user.domain.AcceptedChatInvitation"
       ]
     }
   };
 
-  rpc CreateUser (CreateUserCommand) returns (google.protobuf.Empty) {
+  rpc createUser (CreateUserCommand) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/user/{user_id}"
       body: "*"
     };
   }
 
-  rpc GetUser (GetUserCommand) returns (UserView) {
+  rpc getUser (GetUserCommand) returns (UserView) {
     option (google.api.http) = {
       get: "/user/{user_id}"
     };
   }
 
-  rpc AddPerson(person.domain.PersonCreated) returns (google.protobuf.Empty) {
+  rpc addPerson(person.domain.PersonCreated) returns (google.protobuf.Empty) {
     option (akkaserverless.method).eventing.in = {
       event_sourced_entity: "person"
     };
   }
 
-  rpc ReceiveMessage (actor.user.domain.SendMessageDto) returns (google.protobuf.Empty) {
+  rpc receiveMessage (actor.user.domain.SendMessageDto) returns (google.protobuf.Empty) {
     option (akkaserverless.method).eventing.in = {
       topic: "message"
     };
   }
 
+
+  rpc addContactInvitation(AddContactInvitation) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/user/{user_id}/contacts/invites"
+      body: "*"
+    };
+  }
+
+  rpc deleteContactInvitation(DeleteContactInvitation) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/user/{user_id}/invites"
+      body: "*"
+    };
+  }
+
+  rpc addContact(AddContact) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/user/{user_id}/contacts/accept"
+      body: "*"
+    };
+  }
+
+  rpc deleteContact(DeleteContact) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/user/{user_id}/contacts"
+      body: "*"
+    };
+  }
+
+  rpc getContacts (ListContacts) returns (Contacts) {
+    option (google.api.http) = {
+      get: "/user/{user_id}/contacts"
+    };
+  }
+
+  rpc getContactInvitations (ListContactsInvitations) returns (ContactInvites) {
+    option (google.api.http) = {
+      get: "/user/{user_id}/contacts/invites"
+    };
+  }
+
+  rpc addChatInvitation(AddChatInvitation) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/user/{user_id}/chats/invites"
+      body: "*"
+    };
+  }
+
+  rpc deleteChatInvitation(DeleteContactInvitation) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/user/{user_id}/chats/invites"
+      body: "*"
+    };
+  }
+
+  rpc acceptChatInvitation(AcceptChatInvitation) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/user/{user_id}/chats"
+      body: "*"
+    };
+  }
+
+  rpc refuseChatInvitation(RefuseChatInvitation) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/user/{user_id}/chats"
+      body: "*"
+    };
+  }
 
 }

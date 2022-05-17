@@ -25,9 +25,57 @@ message ReceiveMessageDto {
   string message = 2;
 }
 
+message Contact {
+  string user_id = 1;
+}
+
+message AddedContactInvitation {
+  string Contact = 1;
+}
+
+message DeletedContactInvitation {
+  string Contact = 1;
+}
+
+message AddedContact {
+  string Contact = 1;
+}
+
+message DeletedContact {
+  string Contact = 1;
+}
+
+message Chat {
+  string chat_id = 2;
+}
+message ChatInvite {
+  string from_user_id = 1;
+  string chat_id = 2;
+}
+message AddedChatInvitation {
+  string from_user_id = 1;
+  string chat_id = 2;
+}
+
+message DeletedChatInvitation {
+  string signed_by_user_id = 1;
+  string chat_id = 2;
+}
+
+message AcceptedChatInvitation {
+  string chat_id = 1;
+}
+message RefusedChatInvitation {
+  string chat_id = 1;
+}
+
 message UserState {
   string name = 1;
   repeated string persons = 2;
   repeated string messages = 3;
+  repeated Contact invites = 4;
+  repeated Contact contacts = 5;
+  repeated string chatInvitesIds = 6;
+  repeated string acceptedChatsIds = 7;
 }
 

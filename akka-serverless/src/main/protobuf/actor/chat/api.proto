@@ -7,7 +7,7 @@ import "google/api/annotations.proto";
 
 package actor.chat;
 
-message AddMessageCommand {
+message AddMessage {
   string chat_id = 1 [(akkaserverless.field).entity_key = true];
   string message = 2;
 }
@@ -20,8 +20,38 @@ message ChatView {
   repeated MessageView items = 1;
 }
 
-message GetChatCommand {
+message GetChat {
   string chat_id = 1 [(akkaserverless.field).entity_key = true];
+}
+
+message AddAdmin {
+  string chat_id = 1 [(akkaserverless.field).entity_key = true];
+  string user_id = 2;
+  repeated string signedBy = 3;
+}
+
+message RemoveAdmin {
+  string chat_id = 1 [(akkaserverless.field).entity_key = true];
+  string user_id = 2;
+  repeated string signedBy = 3;
+}
+
+
+message AddUser {
+  string chat_id = 1 [(akkaserverless.field).entity_key = true];
+  string user_id = 2;
+  repeated string signedBy = 3;
+}
+
+message RemoveUser {
+  string chat_id = 1 [(akkaserverless.field).entity_key = true];
+  string user_id = 2;
+  repeated string signedBy = 3;
+}
+
+message CreateChat {
+  string chat_id = 1 [(akkaserverless.field).entity_key = true];
+  string admin = 2;
 }
 
 service ChatService {
@@ -31,21 +61,63 @@ service ChatService {
       entity_type: "chat"
       state: "actor.chat.domain.ChatState",
       events: [
-        "actor.chat.domain.MessageAdded"
+        "actor.chat.domain.MessageAdded",
+        "actor.chat.domain.AdminAdded",
+        "actor.chat.domain.AdminRemoved",
+        "actor.chat.domain.UserAdded",
+        "actor.chat.domain.UserRemoved",
+        "actor.chat.domain.CreatedChat"
       ]
     }
   };
 
-  rpc AddMessage (AddMessageCommand) returns (google.protobuf.Empty) {
+
+  rpc createChat (CreateChat) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/chat/{chat_id}"
+      body: "*"
+    };
+  }
+
+  rpc addMessage (AddMessage) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/chat/{chat_id}/add"
       body: "*"
     };
   }
 
-  rpc GetChat (GetChatCommand) returns (ChatView) {
+  rpc getChat (GetChat) returns (ChatView) {
     option (google.api.http) = {
       get: "/chat/{chat_id}"
+    };
+  }
+
+
+  rpc addUser (AddUser) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/chat/{chat_id}/users"
+      body: "*"
+    };
+  }
+
+  rpc deleteUser (RemoveUser) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/chat/{chat_id}/users"
+      body: "*"
+    };
+  }
+
+  rpc addAdmin (AddAdmin) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/chat/{chat_id}/admins"
+      body: "*"
+    };
+  }
+
+  rpc deleteAdmin (RemoveAdmin) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/chat/{chat_id}/admins"
+      body: "*"
     };
   }
 

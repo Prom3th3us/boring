@@ -12,7 +12,40 @@ message MessageAdded {
   Message message = 2;
 }
 
+
+message AdminAdded {
+  string chat_id = 1 [(akkaserverless.field).entity_key = true];
+  string user_id = 2;
+  repeated string signedBy = 3;
+}
+
+message AdminRemoved {
+  string chat_id = 1 [(akkaserverless.field).entity_key = true];
+  string user_id = 2;
+  repeated string signedBy = 3;
+}
+
+message UserAdded {
+  string chat_id = 1 [(akkaserverless.field).entity_key = true];
+  string user_id = 2;
+  repeated string signedBy = 3;
+}
+
+message UserRemoved {
+  string chat_id = 1 [(akkaserverless.field).entity_key = true];
+  string user_id = 2;
+  repeated string signedBy = 3;
+}
+
+
+message CreatedChat {
+  string chat_id = 1 [(akkaserverless.field).entity_key = true];
+  string admin = 2;
+}
+
 message ChatState {
-  repeated Message messages = 1;
+  repeated string admins = 1;
+  repeated string users = 2;
+  repeated Message messages = 3;
 }
 
